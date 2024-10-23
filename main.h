@@ -1,18 +1,19 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <netinet/in.h>
+
 // Struct for a received request
 struct request {
-    unsigned char *data;
-    // The client socket descriptor
     int client_sd;
+    struct sockaddr_in client_addr;
+    unsigned char *data;
 };
 
 // Struct for passing the response
 struct response {
-    unsigned char *data;
-    // The client socket descriptor
     int client_sd;
+    unsigned char *data;
 };
 
 #endif
