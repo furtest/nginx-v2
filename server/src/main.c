@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "sockets.h"
+#include "../include/sockets.h"
 
 int main(int argc, char **argv){
 
