@@ -7,6 +7,7 @@
 struct request {
     int client_sd;
     struct sockaddr_in client_addr;
+    size_t data_len;
     unsigned char *data;
 };
 

@@ -12,6 +12,15 @@ int main(int argc, char **argv){
     }
     
     int sd = init_socket("127.0.0.1", atoi(argv[1]));
+    if(sd < 0){
+	exit(EXIT_FAILURE);
+    }
+
+    struct request *req = wait_for_request(sd);
+    
+    fwrite(req->data, req->data_len, 1, stdout);
+
+    free(req);
     close(sd);
 
     return EXIT_SUCCESS;
