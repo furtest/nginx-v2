@@ -1,5 +1,5 @@
 CC := clang
-CFLAGS := -g -Wall -o
+CFLAGS := -g -Wall -D IN_DEV
 
 BUILDDIR := ./server/build
 INCLUDE := ./server/include
@@ -15,10 +15,10 @@ $(BUILDDIR):
 	mkdir $(BUILDDIR)
 
 $(OUTPUT): $(OBJFILES)
-	$(CC) $(CFLAGS) $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(BUILDDIR)/%.o: $(SRC)/%.c
-	$(CC) $(CFLAGS) $@ -c $< 
+	$(CC) $(CFLAGS) -o $@ -c $< 
 
 clean:
 	rm -f $(BUILDDIR)/*.o

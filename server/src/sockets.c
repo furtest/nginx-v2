@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 #include "../include/sockets.h"
-#include "../include/main.h"
 
 // Initializing socket 
 // Args :
@@ -20,6 +19,13 @@ int init_socket(char *ip, int port){
 	perror("Failed to open socket");
 	return -1;
     }
+    
+// For dev only, IN_DEV is set (or not) at compile time
+#ifdef IN_DEV
+    if(setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0){
+	perror("Failed to set dev option");
+    }
+#endif
     
     // We define and initialize the address 
     struct sockaddr_in addr = {0};
@@ -48,9 +54,9 @@ int init_socket(char *ip, int port){
 // Args :
 // - int server_sd : The socket descriptor of the server
 // Returns :
-// struct request : the received request including the address of the client and the request itself
-struct request *wait_for_request(int server_sd){
-    struct request *req = malloc(sizeof(struct request));
+// struct tcp_info : the received request including the address of the client and the request itself
+struct tcp_info *wait_for_request(int server_sd){
+    struct tcp_info *req = malloc(sizeof(struct tcp_info));
     
     // Accept the connection
     unsigned int client_size = sizeof(struct sockaddr_in);
@@ -100,4 +106,10 @@ ssize_t get_request(int sd, void **data){
 }
 
 
-ssize_t send_response(struct response *response);
+ssize_t send_response(struct tcp_info *response){
+    ssize_t return_value = send(response->client_sd, response->data, response->data_len, 0);
+
+    if( return_value < 0) perror("Failed to send data");
+
+    return return_value;
+}
