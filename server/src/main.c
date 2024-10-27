@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,9 +17,17 @@ int main(int argc, char **argv){
 	exit(EXIT_FAILURE);
     }
 
-    struct request *req = wait_for_request(sd);
+    struct tcp_info *req = wait_for_request(sd);
     
     fwrite(req->data, req->data_len, 1, stdout);
+
+    struct tcp_info response = {0};
+    response.client_sd = req->client_sd;
+    response.data = (unsigned char *) "Message received !!";
+    response.data_len = strlen((char *) response.data);
+
+    send_response(&response);
+
 
     free(req);
     close(sd);
