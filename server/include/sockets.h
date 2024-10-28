@@ -2,6 +2,7 @@
 #define SOCKETS_H
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <netinet/in.h>
 
 #define BLOCK_SIZE 1024
@@ -12,12 +13,12 @@ struct tcp_info {
     int client_sd;
     struct sockaddr_in client_addr;
     size_t data_len;
-    unsigned char *data;
+    uint8_t *data;
 };
 
 int init_socket(char *ip, int port);
 struct tcp_info *wait_for_request(int server_sd);
-ssize_t get_tcp_request(int sd, void **data);
+ssize_t get_tcp_request(int sd, uint8_t **data);
 ssize_t send_tcp_response(struct tcp_info *response);
 
 #endif

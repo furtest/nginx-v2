@@ -85,7 +85,7 @@ struct tcp_info *wait_for_request(int server_sd){
 // Args :
 // - int sd : The client's socket descriptor
 // - void **data : The address of a buffer to fill with data, should be NULL
-ssize_t get_tcp_request(int sd, void **data){
+ssize_t get_tcp_request(int sd, uint8_t **data){
     if(*data != NULL) return -1;
 
     // Computation of the request size
