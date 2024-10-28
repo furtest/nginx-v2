@@ -22,13 +22,4 @@ struct http_response{
     char *body;
 };
 
-struct http_request *parse_request(const char *data, size_t n);
-char * parse_uri(void *raw_uri, size_t n);
-int decode_uri(void *uri, size_t n);
-
-struct http_response *create_response(struct http_request *request);
-char *read_file(char *path);
-FILE *open_file(char *path);
-char *format_response(struct http_response *response);
-
 #endif
