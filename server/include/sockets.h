@@ -17,7 +17,7 @@ struct tcp_info {
 
 int init_socket(char *ip, int port);
 struct tcp_info *wait_for_request(int server_sd);
-ssize_t get_request(int sd, void **data);
-ssize_t send_response(struct tcp_info *response);
+ssize_t get_tcp_request(int sd, void **data);
+ssize_t send_tcp_response(struct tcp_info *response);
 
 #endif

@@ -26,7 +26,7 @@ int main(int argc, char **argv){
     response.data = (unsigned char *) "Message received !!";
     response.data_len = strlen((char *) response.data);
 
-    send_response(&response);
+    send_tcp_response(&response);
 
 
     free(req);

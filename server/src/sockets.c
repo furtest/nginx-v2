@@ -71,7 +71,7 @@ struct tcp_info *wait_for_request(int server_sd){
     req->data = NULL;
 
     // Receive the data
-    if((req->data_len = get_request(client_sd, (void *) &(req->data))) < 0){
+    if((req->data_len = get_tcp_request(client_sd, (void *) &(req->data))) < 0){
 	free(req);
 	return NULL;
     }
@@ -85,7 +85,7 @@ struct tcp_info *wait_for_request(int server_sd){
 // Args :
 // - int sd : The client's socket descriptor
 // - void **data : The address of a buffer to fill with data, should be NULL
-ssize_t get_request(int sd, void **data){
+ssize_t get_tcp_request(int sd, void **data){
     if(*data != NULL) return -1;
 
     // Computation of the request size
@@ -106,7 +106,7 @@ ssize_t get_request(int sd, void **data){
 }
 
 
-ssize_t send_response(struct tcp_info *response){
+ssize_t send_tcp_response(struct tcp_info *response){
     ssize_t return_value = send(response->client_sd, response->data, response->data_len, 0);
 
     if( return_value < 0) perror("Failed to send data");
