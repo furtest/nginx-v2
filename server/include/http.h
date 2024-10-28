@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-enum HTTP_METHOD {GET, HEAD, POST};
+enum HTTP_METHOD {GET, HEAD, POST, PUT, DELETE, LINK, UNLINK, ERROR};
 
 struct http_request{
     enum HTTP_METHOD method;

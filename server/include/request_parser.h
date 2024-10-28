@@ -6,6 +6,7 @@
 #include "http.h"
 
 struct http_request *parse_request(const char *data, size_t n);
+enum HTTP_METHOD parse_method(const char *data);
 char * parse_uri(void *raw_uri, size_t n);
 int decode_uri(void *uri, size_t n);
 
