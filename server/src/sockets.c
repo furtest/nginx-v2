@@ -7,12 +7,14 @@
 
 #include "../include/sockets.h"
 
-// Initializing socket 
-// Args :
-// - char *ip : the ip to bind the socket to 
-// - int port : the listening port
-// Returns :
-// int : the socket descriptor
+/*
+* Initializing socket 
+* Args :
+* - char *ip : the ip to bind the socket to 
+* - int port : the listening port
+* Returns :
+* int : the socket descriptor
+*/
 int init_socket(char *ip, int port){
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if(sd < 0){
@@ -27,7 +29,6 @@ int init_socket(char *ip, int port){
     }
 #endif
     
-    // We define and initialize the address 
     struct sockaddr_in addr = {0};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
@@ -37,7 +38,6 @@ int init_socket(char *ip, int port){
 	return -2;
     }
     
-    // We bind the socket to the address
     if(bind(sd, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) != 0){
 	perror("Failed to bind socket");
 	return -3;
@@ -49,16 +49,13 @@ int init_socket(char *ip, int port){
     return sd;   
 }
 
-
-// Wait for a request, accept it and read the request
-// Args :
-// - int server_sd : The socket descriptor of the server
-// Returns :
-// struct tcp_info : the received request including the address of the client and the request itself
+/*
+* Wait for a request, accept it and read the request
+* Returns : the received request including the address of the client and the request itself
+*/
 struct tcp_info *wait_for_request(int server_sd){
     struct tcp_info *req = malloc(sizeof(struct tcp_info));
     
-    // Accept the connection
     unsigned int client_size = sizeof(struct sockaddr_in);
     int client_sd = accept(server_sd, (struct sockaddr *) &(req->client_addr), &client_size);
     
@@ -70,7 +67,6 @@ struct tcp_info *wait_for_request(int server_sd){
     req->client_sd = client_sd;
     req->data = NULL;
 
-    // Receive the data
     if((req->data_len = get_tcp_request(client_sd, (void *) &(req->data))) < 0){
 	free(req);
 	return NULL;
@@ -80,19 +76,18 @@ struct tcp_info *wait_for_request(int server_sd){
     return req;
 }
 
-
-// Read the data (request) on the socket 
-// Args :
-// - int sd : The client's socket descriptor
-// - void **data : The address of a buffer to fill with data, should be NULL
+/*
+* Read the data (request) on the socket 
+* Args :
+* sd : The client's socket descriptor
+* data : The address of a buffer to fill with data, should be NULL
+*/
 ssize_t get_tcp_request(int sd, uint8_t **data){
     if(*data != NULL) return -1;
 
-    // Computation of the request size
     size_t size = 0;
     size_t len_received = 0;
 
-    // Allocate the buffer and receive the data
     do{
 	*data = realloc(*data, BLOCK_SIZE);
 	if(*data == NULL){
