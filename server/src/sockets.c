@@ -67,7 +67,7 @@ struct tcp_info *wait_for_request(int server_sd){
     req->client_sd = client_sd;
     req->data = NULL;
 
-    if((req->data_len = get_tcp_request(client_sd, (void *) &(req->data))) < 0){
+    if((req->data_len = receive_tcp_request(client_sd, (void *) &(req->data))) < 0){
 	free(req);
 	return NULL;
     }
@@ -82,7 +82,7 @@ struct tcp_info *wait_for_request(int server_sd){
 * sd : The client's socket descriptor
 * data : The address of a buffer to fill with data, should be NULL
 */
-ssize_t get_tcp_request(int sd, uint8_t **data){
+ssize_t receive_tcp_request(int sd, uint8_t **data){
     if(*data != NULL) return -1;
 
     size_t size = 0;
