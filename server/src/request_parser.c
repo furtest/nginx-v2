@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "../include/request_parser.h"
 #include "../include/http.h"
@@ -10,18 +11,36 @@ struct http_request *parse_request(const uint8_t *request, size_t len)
     struct http_request *req = malloc(sizeof(*req));
     if(req == NULL)
 	return NULL;
-    if(len < 16)
-	goto bad_request;
+    if(len < 16){
+	req->method = BAD_REQUEST;
+	goto parse_request_fail;
+    }
 
     enum HTTP_METHOD method = parse_method((char *) request);
-    if(method == BAD_REQUEST)
-	goto bad_request;
+    if(method == BAD_REQUEST){
+	req->method = BAD_REQUEST;
+	goto parse_request_fail;
+    }
 
+
+    req->uri = extract_uri((char *) request);
+    if(req->uri == NULL){
+	switch (errno) {
+	case EINVAL:
+	    req->method = BAD_REQUEST;
+	    break;
+
+	case ENOMEM:
+	default:
+	    req->method = INTERNAL_SERVER_ERROR;
+	    break;
+	}
+	goto parse_request_fail;
+    }
 
     return req;
 
-bad_request:
-    req->method = BAD_REQUEST;
+parse_request_fail:
     req->len = 0;
     req->uri = NULL;
     req->headers = NULL;
@@ -102,19 +121,25 @@ enum HTTP_METHOD parse_method(const char *request)
 char *extract_uri(const char *request)
 {
     const char *start = strchr(request, ' ');
-    if(start == NULL)
+    if(start == NULL){
+	errno = EINVAL;
 	return NULL;
+    }
 
     start++;
 
     const char *end = strchr(start, ' ');
-    if(end == NULL)
+    if(end == NULL){
+	errno = EINVAL;
 	return NULL;
+    }
 
     size_t uri_len = end - start;
     char *uri = calloc(uri_len + 1, 1);
-    if(uri == NULL)
+    if(uri == NULL){
+	errno = ENOMEM;
 	return NULL;
+    }
 
     memcpy(uri, start, uri_len);
     return uri;
