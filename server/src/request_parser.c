@@ -94,23 +94,33 @@ enum HTTP_METHOD parse_method(const char *request)
 
 /*
  * Extracts the URI from the request and returns it.
+ * This function assumes that the request has a valid HTTP method.
+ * Returns NULL in case of error sets errno to 
+ * - EINVAl : bad request
+ * - ENOMEM : failed memory allocation
  */
 char *extract_uri(const char *request)
 {
-    const char *cursor = request;
-    while(*cursor != ' ' && *(cursor++) != '\0') {}
-    if(*cursor == '\0')
-	return NULL;
-    const char *start = ++cursor;
-
-    while(*cursor != ' ' && *(cursor++) != '\0') {}
-    if(*cursor == '\0')
+    const char *start = strchr(request, ' ');
+    if(start == NULL)
 	return NULL;
 
-    size_t uri_len = cursor - start;
+    start++;
+
+    const char *end = strchr(start, ' ');
+    if(end == NULL)
+	return NULL;
+
+    size_t uri_len = end - start;
     char *uri = calloc(uri_len + 1, 1);
-    strncpy(uri, cursor, uri_len);
-    return NULL;
+    if(uri == NULL)
+	return NULL;
+
+    memcpy(uri, start, uri_len);
+    return uri;
 }
 
-int decode_uri(void *uri, size_t n);
+ssize_t parse_uri(const char *uri, uint8_t *parsed_uri){
+    size_t uri_len = strlen(uri); 
+    return 0;
+}
