@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "../include/request_parser.h"
-#include "../include/http.h"
+#include "request_parser.h"
+#include "http.h"
 
 struct http_request *parse_request(const uint8_t *request, size_t len)
 {
@@ -15,6 +15,8 @@ struct http_request *parse_request(const uint8_t *request, size_t len)
 	req->method = BAD_REQUEST;
 	goto parse_request_fail;
     }
+    
+    // TODO check the size of the request and the uri (set a max size for both)
 
     enum HTTP_METHOD method = parse_method((char *) request);
     if(method == BAD_REQUEST){
@@ -142,10 +144,55 @@ char *extract_uri(const char *request)
     }
 
     memcpy(uri, start, uri_len);
+    uri[uri_len] = '\0';
     return uri;
 }
 
-ssize_t parse_uri(const char *uri, uint8_t *parsed_uri){
+/*
+ * Parse an extracted uri, handles the % HEX HEX parts.
+ * parsed_uri should be at least the same size as uri-1
+ * Returns the size of the parsed uri.
+ * On error returns -1 and sets errno to :
+ * - EINVAL : INTERNAL_SERVER_ERROR
+ * - EBADMSG : BAD_REQUEST
+ */
+ssize_t parse_uri(const char *uri, uint8_t *parsed_uri)
+{
+    if(uri == NULL || parsed_uri == NULL){
+	errno = EINVAL;
+	return -1;
+    }
+
     size_t uri_len = strlen(uri); 
-    return 0;
+    size_t parsed_len = uri_len;
+    const char *cursor = uri;
+    const char *next = NULL;
+    while ((next = strchr(cursor, '%')) != NULL) {
+	parsed_len -= 2;	
+	if(next >= uri + uri_len + 2){
+	    errno = EBADMSG;
+	    return -1;
+	}
+	
+	for(size_t i = 0; cursor != next; ++cursor, ++i){
+	    parsed_uri[cursor - uri + i] = *cursor;
+	}
+	// Increase cursor so we do not find the same % on the next loop
+	++cursor;
+
+	char val[3];
+	val[0] = cursor[1];
+	val[1] = cursor[2];
+	val[2] = '\0';
+	char *endptr = NULL;
+	uint8_t value = (uint8_t) strtol(val, &endptr, 16);
+
+	if(*endptr != '\0'){
+	    errno = EBADMSG;
+	    return -1;
+	}
+	parsed_uri[next - uri] = value;
+    }
+    
+    return parsed_len;
 }
