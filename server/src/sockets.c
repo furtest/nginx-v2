@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../include/sockets.h"
+#include "sockets.h"
 
 /*
 * Initializing socket 

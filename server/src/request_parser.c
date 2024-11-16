@@ -15,7 +15,7 @@ struct http_request *parse_request(const uint8_t *request, size_t len)
 	req->method = BAD_REQUEST;
 	goto parse_request_fail;
     }
-    
+
     // TODO check the size of the request and the uri (set a max size for both)
 
     enum HTTP_METHOD method = parse_method((char *) request);
@@ -163,17 +163,17 @@ ssize_t parse_uri(const char *uri, uint8_t *parsed_uri)
 	return -1;
     }
 
-    size_t uri_len = strlen(uri); 
+    size_t uri_len = strlen(uri);
     size_t parsed_len = uri_len;
     const char *cursor = uri;
     const char *next = NULL;
     while ((next = strchr(cursor, '%')) != NULL) {
-	parsed_len -= 2;	
+	parsed_len -= 2;
 	if(next >= uri + uri_len + 2){
 	    errno = EBADMSG;
 	    return -1;
 	}
-	
+
 	for(size_t i = 0; cursor != next; ++cursor, ++i){
 	    parsed_uri[cursor - uri + i] = *cursor;
 	}
@@ -193,6 +193,6 @@ ssize_t parse_uri(const char *uri, uint8_t *parsed_uri)
 	}
 	parsed_uri[next - uri] = value;
     }
-    
+
     return parsed_len;
 }
