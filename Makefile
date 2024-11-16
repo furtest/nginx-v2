@@ -1,10 +1,10 @@
-CC := clang
-CFLAGS := -g -Wall -D IN_DEV
-
 BUILDDIR := ./server/build
 INCLUDE := ./server/include
 SRC := ./server/src
 OUTPUT := output
+
+CC := clang
+CFLAGS := -g -Wall -I $(INCLUDE) -D IN_DEV
 
 SRCFILES := $(shell ls $(SRC))
 OBJFILES := $(patsubst %.c, $(BUILDDIR)/%.o, $(SRCFILES))
